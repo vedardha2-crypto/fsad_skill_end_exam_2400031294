@@ -1,0 +1,55 @@
+package com.klef.fsad.exam;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
+import java.util.Date;
+
+public class ClientDemo 
+{
+    public static void main(String[] args) 
+    {
+        Configuration cfg = new Configuration();
+        cfg.configure("hibernate.cfg.xml");
+
+        SessionFactory sf = cfg.buildSessionFactory();
+
+        // INSERT OPERATION
+        Session session = sf.openSession();
+        Transaction tx = session.beginTransaction();
+
+        Vehicle v = new Vehicle("Car", "Four Wheeler", new Date(), "Available");
+
+        session.save(v);
+
+        tx.commit();
+        session.close();
+
+        System.out.println("Vehicle Inserted with ID: " + v.getId());
+
+        // UPDATE OPERATION
+        Session session2 = sf.openSession();
+        Transaction tx2 = session2.beginTransaction();
+
+        int vehicleId = v.getId(); // updating same record
+
+        Vehicle existingVehicle = session2.get(Vehicle.class, vehicleId);
+
+        if (existingVehicle != null) {
+            existingVehicle.setName("Updated Car");
+            existingVehicle.setStatus("Not Available");
+
+            session2.update(existingVehicle);
+            System.out.println("Vehicle Updated Successfully");
+        } else {
+            System.out.println("Vehicle Not Found");
+        }
+
+        tx2.commit();
+        session2.close();
+
+        sf.close();
+    }
+}
